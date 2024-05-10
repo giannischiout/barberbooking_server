@@ -2,7 +2,7 @@ const { model, models, Schema } = require('mongoose');
 // Define User schema
 const userSchema = new Schema({
     username: String,
-    email: String,
+    email: { type: String, index: true }, 
     password: String,
     phone: String,
     address: String,
@@ -12,10 +12,9 @@ const userSchema = new Schema({
 // Define Barber schema
 const barberSchema = new Schema({
     name: String,
-    specialty: String,
-    contactInfo: String,
-    phone: Number,
-    email: String,
+    specialty: { type: String, index: true }, 
+    phone: { type: Number, index: true }, 
+    email: { type: String, index: true }, 
     workingHours: [{
         day: {
             type: String,
@@ -23,13 +22,13 @@ const barberSchema = new Schema({
         },
         timeSlots: [{
             startTime: {
-                type: Number,
+                type: String,
                 min: 0,
                 max: 2359,
                 required: true
             },
             endTime: {
-                type: Number,
+                type: String,
                 min: 0,
                 max: 2359,
                 required: true

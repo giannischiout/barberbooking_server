@@ -35,8 +35,7 @@ exports.getAppointments = async (req, res) => {
             }
         ]
         let slots = createTimeSlots(newappointments, new Date(date));
-        // console.log('slots')
-        // console.log(slots)
+      
         res.status(200).json(response);
     } catch (error) {
         console.error('Error retrieving appointments:', error);
@@ -88,17 +87,29 @@ exports.createAppointment = async (req, res) => {
 
 
 function createTimeSlots(appointments, date) {
-    let interval = 30;
-    const openingTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0); // Start time: 9:00 AM
-    const closingTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 0); // End time: 5:00 PM
+    const daySchedule = [
+        {
+            openingTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0),
+            closingTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 14, 0)
+        },
+        {
+            openingTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0),
+            closingTime: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 21, 0)
+        },
+    ]
+
+    const array = daySchedule.map(timeslot => findAvailableSpotsBasedOnOpeningTimes(appointments, timeslot.openingTime, timeslot.closingTime, 30));
+    console.log(array);
+}
+
+
+function findAvailableSpotsBasedOnOpeningTimes(appointments, openingTime, closingTime, interval) {
     const timeSlots = [];
-    for (let time = new Date(openingTime); time <= closingTime; time.setMinutes(time.getMinutes() + 30)) {
+    for (let time = new Date(openingTime); time < closingTime; time.setMinutes(time.getMinutes() + 30)) {
         // Loop through time from startTime to endTime with increments of 30 minutes
         const startTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         // Convert the current time to a formatted string like "09:00 AM"
         const isAvailable = !appointments.some(appointment => appointment.startTime === startTime);
-        
-        console.log(isAvailable)
         // Check if the current time slot is available by searching for existing appointments at that time
         if (isAvailable) {
             // If the time slot is available, add it to the list of time slots
@@ -118,7 +129,5 @@ function createTimeSlots(appointments, date) {
         }
       
     }
-    console.log(timeSlots)
+    return timeSlots
 }
-
-
